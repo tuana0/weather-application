@@ -32,6 +32,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.kampplus.hava.R
 import com.kampplus.hava.model.City
 import com.kampplus.hava.ui.LoadState
@@ -158,13 +161,22 @@ private fun SearchBar(query: String, onQueryChange: (String) -> Unit, onSearch: 
  */
 @Composable
 private fun CityList(cities: List<City>, onCityClick: (City) -> Unit, modifier: Modifier = Modifier) {
+    //Seçili şehir ekran döndüğünde de seçili kalır rememnbersaveable sayesinde
+    var selectedCityId by rememberSaveable { mutableStateOf<Long?>(null) }
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(items = cities, key = { it.id }) { city ->
-            CityCard(city = city, onClick = { onCityClick(city) })
+            CityCard(
+                city = city,
+                isSelected = (city.id == selectedCityId),
+                onClick = {
+                    selectedCityId = city.id
+                    onCityClick(city)
+                }
+            )
         }
     }
 }

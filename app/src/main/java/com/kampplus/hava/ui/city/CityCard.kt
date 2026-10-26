@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -36,8 +37,16 @@ import com.kampplus.hava.ui.theme.HavaTheme
  *   yalnızca haber verir — olay yukarı, veri aşağı (state hoisting).
  */
 @Composable
-fun CityCard(city: City, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Card(onClick = onClick, modifier = modifier.fillMaxWidth()) {
+fun CityCard(city: City, isSelected: Boolean = false, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Card(onClick = onClick,
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected)
+               MaterialTheme.colorScheme.primaryContainer
+            else
+                MaterialTheme.colorScheme.surfaceVariant
+        ),
+
+        modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,

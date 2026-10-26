@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import android.util.Log
 import com.kampplus.hava.model.City
 import com.kampplus.hava.ui.city.CityRoute
 import com.kampplus.hava.ui.forecast.ForecastRoute
@@ -34,7 +35,11 @@ fun HavaNavHost(modifier: Modifier = Modifier, navController: NavHostController 
     ) {
         composable(CITY_ROUTE) {
             CityRoute(
-                onCityClick = { city -> navController.navigate(forecastRoute(city)) }
+                onCityClick = { city ->
+
+                    Log.d("CityClick", "Tıklandı: ${city.name}")
+
+                    navController.navigate(forecastRoute(city)) }
             )
         }
         composable(

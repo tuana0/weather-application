@@ -50,6 +50,7 @@ class CityViewModel(
     /** Kullanıcı arama kutusuna her harf yazdığında çağrılır. */
     fun onQueryChange(newQuery: String) {
         _query.value = newQuery
+        search()
     }
 
     /**
@@ -60,25 +61,36 @@ class CityViewModel(
      */
     fun search() {
         viewModelScope.launch {
+            if (_query.value.isBlank()) {
+                _uiState.value = LoadState.Success(STATIC_CITIES)
+                return@launch
+            }
+
+            // 1. Önce 10 sabit şehir içerisinde arama süzmesi yapalım:
+            val filteredStatic = STATIC_CITIES.filter {
+                it.name.contains(_query.value, ignoreCase = true)
+            }
+
+            if (filteredStatic.isNotEmpty()) {
+                _uiState.value = LoadState.Success(filteredStatic)
+                return@launch
+            }
+
+            // 2. Sabit listede eşleşme yoksa internet (API) üzerinden arayalım:
             _uiState.value = LoadState.Loading
             _uiState.value = try {
                 val cities = repository.search(_query.value)
-                // Cevap geldi ama içi boş: bu bir hata değil, "Empty" durumudur.
                 if (cities.isEmpty()) LoadState.Empty else LoadState.Success(cities)
             } catch (e: IOException) {
-                // İnternet yok, DNS çözülemedi veya zaman aşımı.
                 Log.e(TAG, "Arama başarısız: bağlantı hatası", e)
-                LoadState.Error("İnternet bağlantını kontrol et.")
+                LoadState.Empty
             } catch (e: HttpException) {
-                // Sunucu yanıt verdi ama 4xx/5xx döndü.
                 Log.e(TAG, "Arama başarısız: HTTP ${e.code()}", e)
-                LoadState.Error("Sunucu şu an cevap vermiyor.")
+                LoadState.Empty
             } catch (e: JsonSyntaxException) {
-                // Beklenmeyen JSON: model ile yanıt uyuşmuyor.
                 Log.e(TAG, "Arama başarısız: yanıt çözümlenemedi", e)
-                LoadState.Error("Bir şeyler ters gitti. Tekrar dene.")
+                LoadState.Empty
             }
-            // Kullanıcıya sade mesaj, Logcat'e teknik ayrıntı.
         }
     }
 
@@ -86,6 +98,21 @@ class CityViewModel(
         const val TAG = "CityViewModel"
 
         /** Uygulama ilk açıldığında aranan şehir. */
-        const val INITIAL_QUERY = "İstanbul"
+        const val INITIAL_QUERY = ""
+
+        val STATIC_CITIES = listOf(
+            City(1, "Ankara", 39.91987, 32.85427, "TR", "Türkiye", "Ankara"),
+            City(2, "İstanbul", 41.0050, 28.9766, "TR", "Türkiye", "İstanbul"),
+            City(3, "İzmir", 38.41985, 27.1277, "TR", "Türkiye", "İzmir"),
+            City(4, "Bursa", 40.2901, 29.0489, "TR", "Türkiye", "Bursa"),
+            City(5, "Adana", 37.0000, 35.0000, "TR", "Türkiye", "Adana"),
+            City(6, "Antalya", 36.8970, 30.7042, "TR", "Türkiye", "Antalya"),
+            City(7, "Aydın", 37.1333, 28.4167, "TR", "Türkiye", "Aydın"),
+            City(8, "Balıkesir", 39.6167, 27.9167, "TR", "Türkiye", "Balıkesir"),
+            City(9, "Çanakkale", 40.1667, 36.0500, "TR", "Türkiye", "Çanakkale"),
+            City(10, "Çorum", 41.1167, 36.8167, "TR", "Türkiye", "Çorum")
+
+        )
+
     }
 }

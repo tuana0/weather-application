@@ -5,23 +5,25 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text // Doğru Text importu
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import com.kampplus.hava.ui.HavaNavHost
 import com.kampplus.hava.ui.theme.HavaTheme
 
 /**
  * Uygulamanın tek Activity'si; kullanıcının girdiği kapı.
- *
- * Activity bir **pencereyi** yönetir. Pencerenin içine ne çizileceğini ise
+ * Activity bir pencereyi yönetir. Pencerenin içine ne çizileceğini ise
  * Compose söyler: sahne Activity'dir, dekoru Compose kurar.
  */
 class MainActivity : ComponentActivity() {
 
     /**
-     * Ekran oluşturulurken Android bu fonksiyonu **kendisi** çağırır; biz çağırmayız.
+     * Ekran oluşturulurken Android bu fonksiyonu kendisi çağırır; biz çağırmayız.
      * Yaşam döngüsünün ilk adımıdır.
-     *
-     * Logcat'i açıp uygulamayı arka plana alıp geri dönerek `onCreate` / `onStart` /
-     * `onResume` sırasını gözlemleyebilirsin.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +35,17 @@ class MainActivity : ComponentActivity() {
         // Süslü parantezin içi Compose dünyasıdır.
         setContent {
             HavaTheme {
-                HavaNavHost()
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    // Text ve HavaNavHost Box bileşeninin içine alındı
+                    Text(
+                        text = "Merhaba Kamp!",
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                    HavaNavHost()
+                }
             }
         }
     }
@@ -59,7 +71,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private companion object {
-        /** Logcat'te filtrelemek için: arama kutusuna `Lifecycle` yaz. */
+        /** Logcat'te filtrelemek için: arama kutusuna Lifecycle yaz. */
         const val TAG = "Lifecycle"
     }
 }
